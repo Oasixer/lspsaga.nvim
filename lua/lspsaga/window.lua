@@ -115,9 +115,37 @@ end
 function obj:setlines(lines, row, erow)
   row = row or 0
   erow = erow or -1
+
+  local modified = false -- flag to check if we modified any lines
+
+  -- Check for the presence of newlines in each line and remove them.
+  for idx, line in ipairs(lines) do
+    if line:find('\n') then
+      -- Remove the newline character from the string.
+      lines[idx] = line:gsub('\n', '')
+      modified = true
+    end
+  end
+
+  -- If any lines were modified, notify the user.
+  if modified then
+    vim.notify(
+      'Warning: Newline characters were found and removed from one or more lines.',
+      vim.log.levels.WARN
+    )
+  end
+
+  -- Proceed with the original logic.
   api.nvim_buf_set_lines(self.bufnr, row, erow, false, lines)
   return self
 end
+
+-- function obj:setlines(lines, row, erow)
+--   row = row or 0
+--   erow = erow or -1
+--   api.nvim_buf_set_lines(self.bufnr, row, erow, false, lines)
+--   return self
+-- end
 
 --float window only
 function obj:winsetconf(config)
